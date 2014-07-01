@@ -1,0 +1,111 @@
+<!doctype html>
+<html>
+<head>
+  <title>Repro</title>
+  <style>
+			/* tell the SVG path to be a thin blue line without any area fill */
+			path {
+				stroke: steelblue;
+				stroke-width: 1;
+				fill: none;
+			}
+
+			.axis {
+			  shape-rendering: crispEdges;
+			}
+
+			.x.axis line {
+			  stroke: lightgrey;
+			}
+
+			.x.axis .minor {
+			  stroke-opacity: .5;
+			}
+
+			.x.axis path {
+			  display: none;
+			}
+
+			.y.axis line, .y.axis path {
+			  fill: none;
+			  stroke: #000;
+			}
+		</style>
+  <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+  <script src="numeric-1.2.6.min.js" charset="utf-8"></script>
+</head>
+<body>
+<div id="plot1a"></div>
+<div id="plot1b"></div>
+
+<div id="graph" class="aGraph" style="position:absolute;top:0px;left:0; float:left;"></div>
+
+
+	<script>
+		/* worked from https://gist.github.com/benjchristensen/2579599 */
+
+		// define dimensions of graph
+		var m = [80, 80, 80, 80]; // margins
+		var w = 1000 - m[1] - m[3]; // width
+		var h = 400 - m[0] - m[2]; // height
+
+    var tmin = 10, tmax = 20, yinit = 1;
+
+    var sol1a = numeric.dopri(tmin, tmax, yinit, function(t, y) { return y; });
+
+    var xscale = d3.scale.linear().domain([tmin, tmax]).range([0, w]),
+        yscale = d3.scale.linear().domain([0, 1.1*d3.max(sol1a.y)]).range([h, 0]);
+
+		var line = d3.svg.line()
+			// assign the X function to plot our line as we wish
+			.x(function(d) {
+				// verbose logging to show what's actually being done
+				console.log('Plotting X value for data points: ' + d.x);
+				// return the X coordinate where we want to plot this datapoint
+				return xscale(d.x);
+			})
+			.y(function(d) {
+				// verbose logging to show what's actually being done
+				console.log('Plotting Y value for data point: ' + d.y);
+				// return the Y coordinate where we want to plot this datapoint
+				return yscale(d.y);
+			})
+
+			// Add an SVG element with the desired dimensions and margin.
+			var graph = d3.select("#graph").append("svg:svg")
+			      .attr("width", w + m[1] + m[3])
+			      .attr("height", h + m[0] + m[2])
+			    .append("svg:g")
+			      .attr("transform", "translate(" + m[3] + "," + m[0] + ")");
+
+			// create yAxis
+			var xAxis = d3.svg.axis().scale(xscale).tickSize(-h).tickSubdivide(true);
+			// Add the x-axis.
+			graph.append("svg:g")
+			      .attr("class", "x axis")
+			      .attr("transform", "translate(0," + h + ")")
+			      .call(xAxis);
+
+
+			// create left yAxis
+			var yAxisLeft = d3.svg.axis().scale(yscale).ticks(4).orient("left");
+			// Add the y-axis to the left
+			graph.append("svg:g")
+			      .attr("class", "y axis")
+			      .attr("transform", "translate(-25,0)")
+			      .call(yAxisLeft);
+
+  			// Add the line by appending an svg:path element with the data line we created above
+			// do this AFTER the axes above so that the line is above the tick-lines
+
+    var data = [];
+    for (var i=0;i<sol1a.x.length; i++) {
+      data[i] = { x: sol1a.x[i], y: sol1a.y[i] };
+    }
+
+		graph.append("svg:path").attr("d", line(data));
+
+	</script>
+
+</body>
+</html>
