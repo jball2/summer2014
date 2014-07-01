@@ -49,9 +49,26 @@
 		var w = 1000 - m[1] - m[3]; // width
 		var h = 400 - m[0] - m[2]; // height
 
-    var tmin = 10, tmax = 20, yinit = 1;
+    var N = 500000, initI = 2250;
 
-    var sol1a = numeric.dopri(tmin, tmax, yinit, function(t, y) { return y; });
+    var tmin = 10, tmax = 20, yinit = [N-initI, initI], tol = 1e-6, iter = 1000;
+
+    var funcGen = function(b0, b1, L, N, D) {
+      var solAosc = function(t) {
+        return b0*(1 + b1*Math.cos(2*Math.PI*t));
+      };
+      return function(t, y) {
+        var xfer = solAosc(t)*y[0]*y[1]/N;
+        return [
+          (N - y[0] - y[1])/L - xfer,
+          xfer - y[1]/D
+        ];
+      };
+    };
+
+    var sol1a = numeric.dopri(tmin, tmax, yinit, funcGen(500, 0.02, 4, N, 0.02), tol, iter);
+
+    console.log(sol1a);
 
     var xscale = d3.scale.linear().domain([tmin, tmax]).range([0, w]),
         yscale = d3.scale.linear().domain([0, 1.1*d3.max(sol1a.y)]).range([h, 0]);
