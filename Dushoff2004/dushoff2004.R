@@ -35,19 +35,21 @@ endemicEq <- function(params){
   })
 }
 
+# NOTE: methods say value of beta1 used is 0.02, but Figure 1 appears to have been produced using
+# a value of 0.04
 
 fig1A <- c(N = 500000,
            LL = 4,
            DD = 0.02,
            beta0 = 500,
-           beta1 = 0.02)
+           beta1 = 0.04)
 init1A <- endemicEq(fig1A)
 
 fig1B <- c(N = 500000,
            LL = 8,
            DD = 0.025,
            beta0 = 400,
-           beta1 = 0.02)
+           beta1 = 0.04)
 init1B <- endemicEq(fig1B)
 
 
