@@ -35,6 +35,11 @@ endemicEq <- function(params){
   })
 }
 
+intrinsicPeriod <- function(params){
+  with(as.list(params),
+       2*pi*sqrt(DD*LL/(DD*beta0-1))
+  )}
+
 # NOTE: methods say value of beta1 used is 0.02, but Figure 1 appears to have been produced using
 # a value of 0.04
 
@@ -87,4 +92,6 @@ par(mfcol=c(2,1),mar=c(2,2,1,0))
 ts1A <- runSIR(fig1A,col="red",lwd=3)
 ts1B <- runSIR(fig1B,col="red",lwd=3)
 
+intrinsicPeriod(fig1A)
+intrinsicPeriod(fig1B)
 
